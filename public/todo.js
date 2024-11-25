@@ -79,11 +79,11 @@ async function deleteUser(user) {
         },
         body: JSON.stringify({ name: user }),
     })
-    const message = await response.text();
-    msg.textContent = message;
+    const message = await response.text()
+    msg.textContent = message
 
-    todoList.innerText = "";
-    searchInput.value = "";
+    todoList.innerText = ""
+    searchInput.value = ""
     document.getElementById("deleteUser").remove();
 }
 
@@ -101,6 +101,8 @@ async function delTodo(user, todo) {
     msg.textContent = message
 
     const data = await fetch(`http://localhost:3000/todos/${user}`)
-    const todos = await data.json()
-    display(todos, user)
+    if (data.ok) {
+        const todos = await data.json()
+        display(todos, user)
+    }
 }
