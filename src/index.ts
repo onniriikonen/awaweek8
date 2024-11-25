@@ -45,5 +45,16 @@ router.post("/add", (req: Request, res: Response) => {
     })
 })
 
+router.get("/todos/:id", (req: Request, res: Response) => {
+    let { id } = req.params
+    const user = users.find((u) => u.name.toLowerCase() === id.toLowerCase())
+    if (!user) {
+        res.status(404).send("User not found")
+    } else {
+        res.json(user.todos)
+    }
+})
+
+
 
 export default router

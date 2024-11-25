@@ -38,4 +38,14 @@ router.post("/add", (req, res) => {
         res.send(`Todo added successfully for user ${name}.`);
     });
 });
+router.get("/todos/:id", (req, res) => {
+    let { id } = req.params;
+    const user = users.find((u) => u.name.toLowerCase() === id.toLowerCase());
+    if (!user) {
+        res.status(404).send("User not found");
+    }
+    else {
+        res.json(user.todos);
+    }
+});
 exports.default = router;
