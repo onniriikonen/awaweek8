@@ -7,7 +7,7 @@ form.addEventListener("submit", async event => {
     event.preventDefault();
     const user = userInput.value
     const todo = todoInput.value
-    const data = await fetch("http://localhost:8000/add", {
+    const data = await fetch("http://localhost:3000/add", {
         method: "post",
         headers: {
             "Content-type": "application/json"

@@ -4,7 +4,7 @@ import morgan from "morgan"
 import router from "./src/index"
 
 const app: Express = express()
-const port = 8000
+const port = 3000
 
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
