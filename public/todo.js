@@ -101,8 +101,6 @@ async function delTodo(user, todo) {
     msg.textContent = message
 
     const data = await fetch(`http://localhost:3000/todos/${user}`)
-    if (data.ok) {
-        const todos = await data.json()
-        display(todos, user)
-    }
+    const todos = await data.json()
+    display(todos, user)
 }
