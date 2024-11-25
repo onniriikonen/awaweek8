@@ -18,6 +18,7 @@
     "@types/express": "^5.0.0",
     "@types/morgan": "^1.9.9",
     "nodemon": "^3.1.7",
-    "tsc-watch": "^6.2.1"
+    "tsc-watch": "^6.2.1",
+    "tsconfig-paths": "^4.2.0"
   }
 }
