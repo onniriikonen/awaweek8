@@ -55,6 +55,23 @@ router.get("/todos/:id", (req: Request, res: Response) => {
     }
 })
 
+router.put("/update", (req: Request, res: Response) => {
+    const { name, todo } = req.body
+    const user = users.find((u) => u.name.toLowerCase() === name.toLowerCase())
+    if (user) {
+        const index = user.todos.indexOf(todo)
+        user.todos.splice(index, 1)
+    }
+    fs.writeFile("data/users.json", JSON.stringify(users), (err: NodeJS.ErrnoException | null) => {
+        if (err) {
+            console.error(err)
+            return
+        }
+        res.send("Todo deleted successfully.")
+    })
+    
+})
+
 
 
 export default router

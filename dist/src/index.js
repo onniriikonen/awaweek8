@@ -48,4 +48,19 @@ router.get("/todos/:id", (req, res) => {
         res.json(user.todos);
     }
 });
+router.put("/update", (req, res) => {
+    const { name, todo } = req.body;
+    const user = users.find((u) => u.name.toLowerCase() === name.toLowerCase());
+    if (user) {
+        const index = user.todos.indexOf(todo);
+        user.todos.splice(index, 1);
+    }
+    fs_1.default.writeFile("data/users.json", JSON.stringify(users), (err) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        res.send("Todo deleted successfully.");
+    });
+});
 exports.default = router;

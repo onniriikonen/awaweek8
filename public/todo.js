@@ -36,15 +36,41 @@ searchForm.addEventListener("submit", async event => {
         return
     }
     const todos = await data.json()
-    display(todos)
+    display(todos, name)
     msg.innerText = ""
 })
 
-function display(todos) {
+function display(todos, user) {
     todoList.innerText = ""
     todos.forEach((todo) => {
         const item = document.createElement("li")
-        item.textContent = todo
+        const del = document.createElement("a")
+        del.textContent = todo
+        del.href = "#"
+        del.classList.add("delete-task")
+
+        del.addEventListener("click", async (event) => {
+            event.preventDefault()
+            await delTodo(user, todo)
+        })
+        item.appendChild(del)
         todoList.appendChild(item)
     })
+}
+
+async function delTodo(user, todo) {
+    const res = await fetch("http://localhost:3000/update", {
+        method: "put",
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify({ name: user, todo })
+    })
+
+    const message = await res.text()
+    msg.textContent = message
+
+    const data = await fetch(`http://localhost:3000/todos/${user}`)
+    const todos = await data.json()
+    display(todos, user)
 }
