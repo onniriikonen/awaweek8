@@ -48,6 +48,18 @@ router.get("/todos/:id", (req, res) => {
         res.json(user.todos);
     }
 });
+router.delete("/delete", (req, res) => {
+    const { name } = req.body;
+    const index = users.findIndex((u) => u.name.toLowerCase() === name.toLowerCase());
+    users.splice(index, 1);
+    fs_1.default.writeFile("data/users.json", JSON.stringify(users), (err) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        res.send("User deleted successfully.");
+    });
+});
 router.put("/update", (req, res) => {
     const { name, todo } = req.body;
     const user = users.find((u) => u.name.toLowerCase() === name.toLowerCase());

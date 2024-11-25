@@ -55,6 +55,23 @@ router.get("/todos/:id", (req: Request, res: Response) => {
     }
 })
 
+router.delete("/delete", (req: Request, res: Response) => {
+    const { name } = req.body
+
+    const index = users.findIndex((u) => u.name.toLowerCase() === name.toLowerCase())
+    users.splice(index, 1)
+
+    fs.writeFile("data/users.json", JSON.stringify(users), (err: NodeJS.ErrnoException | null) => {
+        if (err) {
+            console.error(err)
+            return
+        }
+        res.send("User deleted successfully.")
+    })
+
+    })
+
+
 router.put("/update", (req: Request, res: Response) => {
     const { name, todo } = req.body
     const user = users.find((u) => u.name.toLowerCase() === name.toLowerCase())

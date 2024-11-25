@@ -38,6 +38,7 @@ searchForm.addEventListener("submit", async event => {
     const todos = await data.json()
     display(todos, name)
     msg.innerText = ""
+    deleteButton(name)
 })
 
 function display(todos, user) {
@@ -57,6 +58,35 @@ function display(todos, user) {
         todoList.appendChild(item)
     })
 }
+
+function deleteButton(name) {
+    const delbtn = document.createElement("button")
+    delbtn.id = "deleteUser"
+    delbtn.textContent = "Delete User"
+
+    delbtn.addEventListener("click", async () => {
+        await deleteUser(name)
+    })
+
+    document.body.appendChild(delbtn)
+}
+
+async function deleteUser(user) {
+    const response = await fetch("http://localhost:3000/delete", {
+        method: "DELETE",
+        headers: {
+            "Content-type": "application/json",
+        },
+        body: JSON.stringify({ name: user }),
+    })
+    const message = await response.text();
+    msg.textContent = message;
+
+    todoList.innerText = "";
+    searchInput.value = "";
+    document.getElementById("deleteUser").remove();
+}
+
 
 async function delTodo(user, todo) {
     const res = await fetch("http://localhost:3000/update", {
