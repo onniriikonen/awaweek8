@@ -47,7 +47,7 @@ router.post("/add", (req: Request, res: Response) => {
 
 router.get("/todos/:id", (req: Request, res: Response) => {
     let { id } = req.params
-    const user = users.find((u) => u.name.toLowerCase() === id.toLowerCase())
+    const user = users.find((u) => u.name === id)
     if (!user) {
         res.status(404).send("User not found")
     } else {
@@ -58,7 +58,7 @@ router.get("/todos/:id", (req: Request, res: Response) => {
 router.delete("/delete", (req: Request, res: Response) => {
     const { name } = req.body
 
-    const index = users.findIndex((u) => u.name.toLowerCase() === name.toLowerCase())
+    const index = users.findIndex((u) => u.name === name)
     users.splice(index, 1)
 
     fs.writeFile("data/users.json", JSON.stringify(users), (err: NodeJS.ErrnoException | null) => {
@@ -74,11 +74,14 @@ router.delete("/delete", (req: Request, res: Response) => {
 
 router.put("/update", (req: Request, res: Response) => {
     const { name, todo } = req.body
-    const user = users.find((u) => u.name.toLowerCase() === name.toLowerCase())
-    if (user) {
-        const index = user.todos.indexOf(todo)
-        user.todos.splice(index, 1)
+    const user = users.find((u) => u.name === name)
+    
+    if (!user) {
+        return
     }
+    const index = user.todos.indexOf(todo)
+    user.todos.splice(index, 1)
+
     fs.writeFile("data/users.json", JSON.stringify(users), (err: NodeJS.ErrnoException | null) => {
         if (err) {
             console.error(err)

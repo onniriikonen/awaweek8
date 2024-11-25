@@ -40,7 +40,7 @@ router.post("/add", (req, res) => {
 });
 router.get("/todos/:id", (req, res) => {
     let { id } = req.params;
-    const user = users.find((u) => u.name.toLowerCase() === id.toLowerCase());
+    const user = users.find((u) => u.name === id);
     if (!user) {
         res.status(404).send("User not found");
     }
@@ -50,7 +50,7 @@ router.get("/todos/:id", (req, res) => {
 });
 router.delete("/delete", (req, res) => {
     const { name } = req.body;
-    const index = users.findIndex((u) => u.name.toLowerCase() === name.toLowerCase());
+    const index = users.findIndex((u) => u.name === name);
     users.splice(index, 1);
     fs_1.default.writeFile("data/users.json", JSON.stringify(users), (err) => {
         if (err) {
@@ -62,11 +62,12 @@ router.delete("/delete", (req, res) => {
 });
 router.put("/update", (req, res) => {
     const { name, todo } = req.body;
-    const user = users.find((u) => u.name.toLowerCase() === name.toLowerCase());
-    if (user) {
-        const index = user.todos.indexOf(todo);
-        user.todos.splice(index, 1);
+    const user = users.find((u) => u.name === name);
+    if (!user) {
+        return;
     }
+    const index = user.todos.indexOf(todo);
+    user.todos.splice(index, 1);
     fs_1.default.writeFile("data/users.json", JSON.stringify(users), (err) => {
         if (err) {
             console.error(err);
