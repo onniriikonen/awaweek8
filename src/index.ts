@@ -40,4 +40,4 @@ router.post("/upload", upload.single("image"), async (req: Request, res: Respons
     }
 })
 
-export default router
+export default router;
