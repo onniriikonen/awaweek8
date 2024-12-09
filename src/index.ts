@@ -40,4 +40,23 @@ router.post("/upload", upload.single("image"), async (req: Request, res: Respons
     }
 })
 
+router.get("/offers", async (req: Request, res: Response) => {
+    try {
+        const offers = await Offer.find().populate("imageId")
+
+        const formattedOffers = offers.map((offer) => ({
+            _id: offer._id,
+            title: offer.title,
+            description: offer.description,
+            price: offer.price,
+            image: offer.imageId ? `/images/${(offer.imageId as any).filename}` : null,
+        }));
+
+        res.status(200).json(formattedOffers)
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: "Error" });
+    }
+});
+
 export default router

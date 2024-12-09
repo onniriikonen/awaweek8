@@ -36,4 +36,21 @@ router.post("/upload", multer_config_1.default.single("image"), async (req, res)
         res.status(500).json({ error: "Error" });
     }
 });
+router.get("/offers", async (req, res) => {
+    try {
+        const offers = await Offer_1.Offer.find().populate("imageId");
+        const formattedOffers = offers.map((offer) => ({
+            _id: offer._id,
+            title: offer.title,
+            description: offer.description,
+            price: offer.price,
+            image: offer.imageId ? `/images/${offer.imageId.filename}` : null,
+        }));
+        res.status(200).json(formattedOffers);
+    }
+    catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: "Error" });
+    }
+});
 exports.default = router;

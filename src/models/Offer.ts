@@ -3,8 +3,8 @@ import mongoose, { Document, Schema } from "mongoose";
 interface IOffer extends Document {
     title: string
     description: string
-    price: string
-    imageId?: string;
+    price: number
+    imageId?: string
 }
 
 let offerSchema: Schema = new Schema({
