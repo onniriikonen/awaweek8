@@ -15,4 +15,4 @@ const imageSchema = new Schema({
 
 const Image: mongoose.Model<IImage> = mongoose.model<IImage>("Image", imageSchema)
 
-export {Image, IImage}
+export {Image, IImage};
