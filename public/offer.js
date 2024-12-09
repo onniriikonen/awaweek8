@@ -1,28 +1,25 @@
 
+
 const form = document.getElementById("offerForm")
-const titleInput = document.getElementById("title")
-const descInput = document.getElementById("description")
-const priceInput = document.getElementById("price")
-const imageInput = document.getElementById("image")
 
 
 form.addEventListener("submit", async event => {
     event.preventDefault();
-    const title = titleInput.value
-    const price = priceInput.value
-    const desc = descInput.value
-    const data = await fetch("http://localhost:3000/upload", {
-        method: "post",
-        headers: {
-            "Content-type": "application/json"
-        },
-        body: `{ "title": "${title}", "price": "${price}", "description": "${desc}" }`
-    })
-    if (data.ok) {
-        console.log("ok")
-    }
+    const formData = new FormData(event.target)
+    try {
+        const data = await fetch("http://localhost:3000/upload", {
+            method: "post",
+            body: formData
+        })
+        if (!data.ok) {
+            throw new Error("failed")
+        }
+        const responseData = await data.json()
+        console.log(responseData.message);
 
-    titleInput.value = ""
-    priceInput.value = ""
-    descInput.value = ""
+        form.reset();
+
+    } catch (error) {
+        console.log("Error", error)
+    }
 })

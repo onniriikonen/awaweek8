@@ -1,21 +1,38 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const Offer_1 = require("./models/Offer");
+const image_1 = require("./models/image");
+const multer_config_1 = __importDefault(require("./middleware/multer-config"));
 const router = (0, express_1.Router)();
-router.post("/upload", async (req, res) => {
+router.post("/upload", multer_config_1.default.single("image"), async (req, res) => {
     try {
         const { title, description, price } = req.body;
+        let imageId = null;
+        if (req.file) {
+            const imgPath = req.file.path.replace("public", "");
+            const image = new image_1.Image({
+                filename: req.file.filename,
+                path: imgPath
+            });
+            const savedImage = await image.save();
+            imageId = savedImage._id;
+            console.log("File uploaded and saved");
+        }
         const newOffer = new Offer_1.Offer({
             title,
             description,
-            price: Number(price)
+            price: Number(price),
+            imageId
         });
         await newOffer.save();
-        res.status(201).json({ message: "Offer saved!" });
+        res.status(201).json({ message: "Offer saved" });
     }
     catch (error) {
-        console.error("Error", error);
+        console.error("Error:", error);
         res.status(500).json({ error: "Error" });
     }
 });

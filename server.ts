@@ -3,7 +3,7 @@ import path from "path"
 import morgan from "morgan"
 import router from "./src/index"
 import mongoose, { Connection } from "mongoose"
-import multer from "multer"
+
 
 const app: Express = express()
 const port = 3000
