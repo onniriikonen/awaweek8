@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express"
 import { Offer } from "./models/Offer"
-import { Image } from "./models/image"
+import { Image } from "./models/Image"
 import upload from "./middleware/multer-config"
 
 const router: Router = Router()
