@@ -1,97 +1,25 @@
 import {Request, Response, Router} from "express"
-import fs from "fs"
+import { Offer } from "./models/Offer"
 
 const router: Router = Router()
 
-type TUser = {
-    name: string
-    todos: string[]
-}
-
-let users: TUser[] = []
-
-fs.readFile("data/users.json", "utf8", (err: NodeJS.ErrnoException | null, data: string) => {
-    if (err) {
-        console.error(err)
-        return
-    }
+router.post("/upload", async (req: Request, res: Response) => {
     try {
-        users = JSON.parse(data)
+        const { title, description, price } = req.body;
 
-    } catch (error: any) {
-        console.error("Error")
+        const newOffer = new Offer({
+            title,
+            description,
+            price: Number(price)
+        });
+
+        await newOffer.save();
+        res.status(201).json({ message: "Offer saved!" });
+    } catch (error) {
+        console.error("Error", error);
+        res.status(500).json({ error: "Error" });
     }
-})
-
-router.get("/", (req: Request, res: Response) => {
-    res.json(users)
-})
-
-router.post("/add", (req: Request, res: Response) => {
-    const { name, todo } = req.body;
-    let user = users.find((u) => u.name === name);
-    if (!user) {
-        user = { name, todos: [] };
-        users.push(user);
-    }
-
-    user.todos.push(todo)
-    fs.writeFile("data/users.json", JSON.stringify(users), (err: NodeJS.ErrnoException | null) => {
-        if (err) {
-            console.error(err)
-            return
-        }
-        res.send(`Todo added successfully for user ${name}.`)
-    })
-})
-
-router.get("/todos/:id", (req: Request, res: Response) => {
-    let { id } = req.params
-    const user = users.find((u) => u.name === id)
-    if (!user) {
-        res.status(404).send("User not found")
-    } else {
-        res.json(user.todos)
-    }
-})
-
-router.delete("/delete", (req: Request, res: Response) => {
-    const { name } = req.body
-
-    const index = users.findIndex((u) => u.name === name)
-    users.splice(index, 1)
-
-    fs.writeFile("data/users.json", JSON.stringify(users), (err: NodeJS.ErrnoException | null) => {
-        if (err) {
-            console.error(err)
-            return
-        }
-        res.send("User deleted successfully.")
-    })
-
-    })
-
-
-router.put("/update", (req: Request, res: Response) => {
-    const { name, todo } = req.body
-    const user = users.find((u) => u.name === name)
-    
-    if (!user) {
-        return
-    }
-    const index = user.todos.indexOf(todo)
-    user.todos.splice(index, 1)
-
-    fs.writeFile("data/users.json", JSON.stringify(users), (err: NodeJS.ErrnoException | null) => {
-        if (err) {
-            console.error(err)
-            return
-        }
-        res.send("Todo deleted successfully.")
-    })
-    
-})
-
+});
 
 
 export default router
