@@ -8,7 +8,7 @@ import multer from "multer"
 const app: Express = express()
 const port = 3000
 
-const mongoDB: string = "mongodb://127.0.0.1:27017/offerdb"
+const mongoDB: string = "mongodb://127.0.0.1:27017/testdb"
 mongoose.connect(mongoDB)
 mongoose.Promise = Promise
 const db: Connection = mongoose.connection
