@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const Offer_1 = require("./models/Offer");
-const image_1 = require("./models/image");
+const Image_1 = require("./models/Image");
 const multer_config_1 = __importDefault(require("./middleware/multer-config"));
 const router = (0, express_1.Router)();
 router.post("/upload", multer_config_1.default.single("image"), async (req, res) => {
@@ -14,7 +14,7 @@ router.post("/upload", multer_config_1.default.single("image"), async (req, res)
         let imageId = null;
         if (req.file) {
             const imgPath = req.file.path.replace("public", "");
-            const image = new image_1.Image({
+            const image = new Image_1.Image({
                 filename: req.file.filename,
                 path: imgPath
             });
