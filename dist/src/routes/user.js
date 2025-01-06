@@ -10,7 +10,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 // import { validateToken } from '../middleware/validateToken'
 const router = (0, express_1.Router)();
 const userList = [];
-router.post("/register", (0, express_validator_1.body)("email").isEmail().normalizeEmail(), (0, express_validator_1.body)("password").isLength({ min: 3 }), async (req, res) => {
+router.post("/register", (0, express_validator_1.body)("email").isEmail(), (0, express_validator_1.body)("password").isLength({ min: 3 }), async (req, res) => {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
         console.log(errors);
@@ -42,7 +42,7 @@ router.post("/register", (0, express_validator_1.body)("email").isEmail().normal
         return;
     }
 });
-router.post("/login", (0, express_validator_1.body)("email").isEmail().normalizeEmail(), (0, express_validator_1.body)("password").exists(), async (req, res) => {
+router.post("/login", (0, express_validator_1.body)("email").isEmail(), (0, express_validator_1.body)("password").exists(), async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = userList.find(user => user.email === email);
