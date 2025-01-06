@@ -26,6 +26,7 @@ router.post("/register",
             return
         }
     try {
+        const email = req.body.email.toLowerCase()
         const existingUser = userList.find(user => user.email === req.body.email)
         if (existingUser) {
             res.status(403).json({email: "Email already in use"})
@@ -36,7 +37,7 @@ router.post("/register",
         const hash: string = bcrypt.hashSync(req.body.password, salt)
 
         const user: IUser = {
-            email: req.body.email,
+            email,
             password: hash
         }
 
@@ -65,7 +66,8 @@ router.post("/login",
     async (req: Request, res: Response) => {
 
         try {
-            const { email, password } = req.body
+            const email = req.body.email.toLowerCase()
+            const { password } = req.body
             const user  = userList.find(user => user.email === email)
 
             if (!user) {
