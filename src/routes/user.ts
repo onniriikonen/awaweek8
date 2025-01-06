@@ -58,6 +58,50 @@ router.post("/register",
     }
 )
 
+
+router.post("/login",
+    body("email").isEmail().normalizeEmail(),
+    body("password").exists(),
+    async (req: Request, res: Response) => {
+
+        try {
+            const { email, password } = req.body
+            const user  = userList.find(user => user.email === email)
+
+            if (!user) {
+                res.status(401).json({message: "Login failed"})
+                return
+            }
+
+            const valid = bcrypt.compareSync(password, user.password);
+
+            if (!valid) {
+                res.status(401).json({ message: "Invalid email or password" });
+                return
+            } 
+
+            const jwtPayload: JwtPayload = {
+                email: user.email,
+            };
+
+            const token: string = jwt.sign(jwtPayload, process.env.SECRET as string, { expiresIn: "2m"})
+
+            res.status(200).json({success: true, token})
+
+            return
+
+
+        } catch(error: any) {
+            console.error(`Error during user login: ${error}`)
+            res.status(500).json({ error: 'Internal Server Error' })
+            return
+        }
+    }
+)
+
+
+
+
 router.get('/list', async (req: Request, res: Response) => {
     try {
         const formattedUsers = userList.map(user => ({

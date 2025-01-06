@@ -11,11 +11,6 @@ const user_1 = __importDefault(require("./src/routes/user"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = parseInt(process.env.PORT) || 8001;
-// const mongoDB: string = "mongodb://127.0.0.1:27017/testdb"
-// mongoose.connect(mongoDB)
-// mongoose.Promise = Promise
-// const db: Connection = mongoose.connection
-// db.on("error" , console.error.bind(console, "Connection error"))
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: false }));
 app.use((0, morgan_1.default)("dev"));
