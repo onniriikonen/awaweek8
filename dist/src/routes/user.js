@@ -9,7 +9,7 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const User_1 = require("../models/User");
 // import { validateToken } from '../middleware/validateToken'
 const router = (0, express_1.Router)();
-router.post("/register", (0, express_validator_1.body)("email").isEmail().normalizeEmail(), (0, express_validator_1.body)("password").isLength({ min: 5 }), async (req, res) => {
+router.post("/register", (0, express_validator_1.body)("email").isEmail().normalizeEmail(), (0, express_validator_1.body)("password").isLength({ min: 3 }), async (req, res) => {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
         console.log(errors);
@@ -25,11 +25,14 @@ router.post("/register", (0, express_validator_1.body)("email").isEmail().normal
         }
         const salt = bcrypt_1.default.genSaltSync(10);
         const hash = bcrypt_1.default.hashSync(req.body.password, salt);
-        await User_1.User.create({
+        const user = await User_1.User.create({
             email: req.body.email,
             password: hash
         });
-        res.status(200).json({ message: "User registered successfully" });
+        res.status(200).json({
+            email: user.email,
+            password: user.password,
+        });
         return;
     }
     catch (error) {
@@ -41,7 +44,11 @@ router.post("/register", (0, express_validator_1.body)("email").isEmail().normal
 router.get('/list', async (req, res) => {
     try {
         const users = await User_1.User.find();
-        res.json(users);
+        const formattedUsers = users.map(user => ({
+            email: user.email,
+            password: user.password,
+        }));
+        res.json(formattedUsers);
         return;
     }
     catch (error) {

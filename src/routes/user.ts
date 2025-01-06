@@ -29,12 +29,16 @@ router.post("/register",
         const salt: string = bcrypt.genSaltSync(10)
         const hash: string = bcrypt.hashSync(req.body.password, salt)
 
-        await User.create({
+        const user = await User.create({
             email: req.body.email,
             password: hash
         })
 
-        res.status(200).json({message: "User registered successfully"})
+        res.status(200).json({
+            email: user.email,
+            password: user.password,
+        })
+
         return 
 
     } catch (error: any) {
@@ -49,7 +53,12 @@ router.post("/register",
 router.get('/list', async (req: Request, res: Response) => {
     try {
         const users = await User.find();
-        res.json(users);
+        const formattedUsers = users.map(user => ({
+                 email: user.email,
+                 password: user.password,
+             }))
+
+        res.json(formattedUsers);
         return 
     } catch (error: any) {
         console.error(`Error fetching users: ${error}`);
