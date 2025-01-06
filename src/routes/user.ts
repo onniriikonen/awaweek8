@@ -9,7 +9,7 @@ const router: Router = Router()
 
 router.post("/register",
     body("email").isEmail().normalizeEmail(),
-    body("password").isLength({min: 5}),
+    body("password").isLength({min: 3}),
     async (req: Request, res: Response) => {
         const errors: Result<ValidationError> = validationResult(req)
 
