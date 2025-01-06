@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const express_validator_1 = require("express-validator");
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const User_1 = require("../models/User");
 // import { validateToken } from '../middleware/validateToken'
 const router = (0, express_1.Router)();
+const userList = [];
 router.post("/register", (0, express_validator_1.body)("email").isEmail().normalizeEmail(), (0, express_validator_1.body)("password").isLength({ min: 3 }), async (req, res) => {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
@@ -17,18 +17,18 @@ router.post("/register", (0, express_validator_1.body)("email").isEmail().normal
         return;
     }
     try {
-        const existingUser = await User_1.User.findOne({ email: req.body.email });
-        console.log(existingUser);
+        const existingUser = userList.find(user => user.email === req.body.email);
         if (existingUser) {
             res.status(403).json({ email: "Email already in use" });
             return;
         }
         const salt = bcrypt_1.default.genSaltSync(10);
         const hash = bcrypt_1.default.hashSync(req.body.password, salt);
-        const user = await User_1.User.create({
+        const user = {
             email: req.body.email,
             password: hash
-        });
+        };
+        userList.push(user);
         res.status(200).json({
             email: user.email,
             password: user.password,
@@ -43,8 +43,7 @@ router.post("/register", (0, express_validator_1.body)("email").isEmail().normal
 });
 router.get('/list', async (req, res) => {
     try {
-        const users = await User_1.User.find();
-        const formattedUsers = users.map(user => ({
+        const formattedUsers = userList.map(user => ({
             email: user.email,
             password: user.password,
         }));

@@ -2,10 +2,17 @@ import { Request, Response, Router } from 'express'
 import { body, Result, ValidationError, validationResult } from 'express-validator'
 import bcrypt from 'bcrypt'
 import jwt, { JwtPayload } from 'jsonwebtoken'
-import { User, IUser } from '../models/User'
 // import { validateToken } from '../middleware/validateToken'
 
-const router: Router = Router()
+const router: Router = Router();
+
+const userList: IUser[] = [];
+
+interface IUser {
+    email: string;
+    password: string;
+}
+
 
 router.post("/register",
     body("email").isEmail().normalizeEmail(),
@@ -19,8 +26,7 @@ router.post("/register",
             return
         }
     try {
-        const existingUser: IUser | null = await User.findOne({ email: req.body.email })
-        console.log(existingUser)
+        const existingUser = userList.find(user => user.email === req.body.email)
         if (existingUser) {
             res.status(403).json({email: "Email already in use"})
             return
@@ -29,10 +35,12 @@ router.post("/register",
         const salt: string = bcrypt.genSaltSync(10)
         const hash: string = bcrypt.hashSync(req.body.password, salt)
 
-        const user = await User.create({
+        const user: IUser = {
             email: req.body.email,
             password: hash
-        })
+        }
+
+        userList.push(user)
 
         res.status(200).json({
             email: user.email,
@@ -52,8 +60,7 @@ router.post("/register",
 
 router.get('/list', async (req: Request, res: Response) => {
     try {
-        const users = await User.find();
-        const formattedUsers = users.map(user => ({
+        const formattedUsers = userList.map(user => ({
                  email: user.email,
                  password: user.password,
              }))
