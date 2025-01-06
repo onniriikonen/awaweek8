@@ -15,7 +15,7 @@ interface IUser {
 
 
 router.post("/register",
-    body("email").isEmail().normalizeEmail(),
+    body("email").isEmail(),
     body("password").isLength({min: 3}),
     async (req: Request, res: Response) => {
         const errors: Result<ValidationError> = validationResult(req)
@@ -26,7 +26,6 @@ router.post("/register",
             return
         }
     try {
-        const email = req.body.email.toLowerCase()
         const existingUser = userList.find(user => user.email === req.body.email)
         if (existingUser) {
             res.status(403).json({email: "Email already in use"})
@@ -37,7 +36,7 @@ router.post("/register",
         const hash: string = bcrypt.hashSync(req.body.password, salt)
 
         const user: IUser = {
-            email,
+            email: req.body.email,
             password: hash
         }
 
@@ -61,13 +60,12 @@ router.post("/register",
 
 
 router.post("/login",
-    body("email").isEmail().normalizeEmail(),
+    body("email").isEmail(),
     body("password").exists(),
     async (req: Request, res: Response) => {
 
         try {
-            const email = req.body.email.toLowerCase()
-            const { password } = req.body
+            const { email, password } = req.body
             const user  = userList.find(user => user.email === email)
 
             if (!user) {
