@@ -14,7 +14,7 @@ const app: Express = express()
 
 const port : number = parseInt(process.env.PORT as string) || 8001
 
-const mongoDB: string = "mongodb://127.0.0.1:27017/usserdb"
+const mongoDB: string = "mongodb://127.0.0.1:27017/testdb"
 mongoose.connect(mongoDB)
 mongoose.Promise = Promise
 const db: Connection = mongoose.connection
