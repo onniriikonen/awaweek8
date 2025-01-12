@@ -7,9 +7,9 @@ const express_1 = require("express");
 const express_validator_1 = require("express-validator");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const User_1 = require("../models/User");
 // import { validateToken } from '../middleware/validateToken'
 const router = (0, express_1.Router)();
-const userList = [];
 router.post("/register", (0, express_validator_1.body)("email").isEmail(), (0, express_validator_1.body)("password").isLength({ min: 3 }), async (req, res) => {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
@@ -18,22 +18,20 @@ router.post("/register", (0, express_validator_1.body)("email").isEmail(), (0, e
         return;
     }
     try {
-        const existingUser = userList.find(user => user.email === req.body.email);
+        const existingUser = await User_1.User.findOne({ email: req.body.email });
         if (existingUser) {
             res.status(403).json({ email: "Email already in use" });
             return;
         }
         const salt = bcrypt_1.default.genSaltSync(10);
         const hash = bcrypt_1.default.hashSync(req.body.password, salt);
-        const user = {
+        await User_1.User.create({
             email: req.body.email,
-            password: hash
-        };
-        userList.push(user);
-        res.status(200).json({
-            email: user.email,
-            password: user.password,
+            password: hash,
+            username: req.body.username,
+            isAdmin: req.body.isAdmin || false,
         });
+        res.status(200).json({ message: "User registered successfully" });
         return;
     }
     catch (error) {
@@ -45,7 +43,7 @@ router.post("/register", (0, express_validator_1.body)("email").isEmail(), (0, e
 router.post("/login", (0, express_validator_1.body)("email").isEmail(), (0, express_validator_1.body)("password").exists(), async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = userList.find(user => user.email === email);
+        const user = await User_1.User.findOne({ email });
         if (!user) {
             res.status(401).json({ message: "Login failed" });
             return;
@@ -57,6 +55,9 @@ router.post("/login", (0, express_validator_1.body)("email").isEmail(), (0, expr
         }
         const jwtPayload = {
             email: user.email,
+            _id: user._id,
+            username: user.username,
+            isAdmin: user.isAdmin,
         };
         const token = jsonwebtoken_1.default.sign(jwtPayload, process.env.SECRET, { expiresIn: "2m" });
         res.status(200).json({ success: true, token });
@@ -68,19 +69,18 @@ router.post("/login", (0, express_validator_1.body)("email").isEmail(), (0, expr
         return;
     }
 });
-router.get('/list', async (req, res) => {
-    try {
-        const formattedUsers = userList.map(user => ({
-            email: user.email,
-            password: user.password,
-        }));
-        res.json(formattedUsers);
-        return;
-    }
-    catch (error) {
-        console.error(`Error fetching users: ${error}`);
-        res.status(500).json({ error: 'Internal Server Error' });
-        return;
-    }
-});
+// router.get('/list', async (req: Request, res: Response) => {
+//     try {
+//         const formattedUsers = userList.map(user => ({
+//                  email: user.email,
+//                  password: user.password,
+//              }))
+//         res.json(formattedUsers);
+//         return 
+//     } catch (error: any) {
+//         console.error(`Error fetching users: ${error}`);
+//         res.status(500).json({ error: 'Internal Server Error' });
+//         return 
+//     }
+// });
 exports.default = router;

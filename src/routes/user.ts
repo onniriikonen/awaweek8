@@ -2,16 +2,10 @@ import { Request, Response, Router } from 'express'
 import { body, Result, ValidationError, validationResult } from 'express-validator'
 import bcrypt from 'bcrypt'
 import jwt, { JwtPayload } from 'jsonwebtoken'
+import { User, IUser } from '../models/User'
 // import { validateToken } from '../middleware/validateToken'
 
 const router: Router = Router();
-
-const userList: IUser[] = [];
-
-interface IUser {
-    email: string;
-    password: string;
-}
 
 
 router.post("/register",
@@ -26,7 +20,7 @@ router.post("/register",
             return
         }
     try {
-        const existingUser = userList.find(user => user.email === req.body.email)
+        const existingUser = await User.findOne({ email: req.body.email })
         if (existingUser) {
             res.status(403).json({email: "Email already in use"})
             return
@@ -35,17 +29,14 @@ router.post("/register",
         const salt: string = bcrypt.genSaltSync(10)
         const hash: string = bcrypt.hashSync(req.body.password, salt)
 
-        const user: IUser = {
+        await User.create({
             email: req.body.email,
-            password: hash
-        }
-
-        userList.push(user)
-
-        res.status(200).json({
-            email: user.email,
-            password: user.password,
+            password: hash,
+            username: req.body.username,
+            isAdmin: req.body.isAdmin || false,
         })
+
+        res.status(200).json({message: "User registered successfully"})
 
         return 
 
@@ -66,7 +57,7 @@ router.post("/login",
 
         try {
             const { email, password } = req.body
-            const user  = userList.find(user => user.email === email)
+            const user = await User.findOne({ email })
 
             if (!user) {
                 res.status(401).json({message: "Login failed"})
@@ -82,6 +73,9 @@ router.post("/login",
 
             const jwtPayload: JwtPayload = {
                 email: user.email,
+                _id: user._id,
+                username: user.username,
+                isAdmin: user.isAdmin,
             };
 
             const token: string = jwt.sign(jwtPayload, process.env.SECRET as string, { expiresIn: "2m"})
@@ -102,21 +96,21 @@ router.post("/login",
 
 
 
-router.get('/list', async (req: Request, res: Response) => {
-    try {
-        const formattedUsers = userList.map(user => ({
-                 email: user.email,
-                 password: user.password,
-             }))
+// router.get('/list', async (req: Request, res: Response) => {
+//     try {
+//         const formattedUsers = userList.map(user => ({
+//                  email: user.email,
+//                  password: user.password,
+//              }))
 
-        res.json(formattedUsers);
-        return 
-    } catch (error: any) {
-        console.error(`Error fetching users: ${error}`);
-        res.status(500).json({ error: 'Internal Server Error' });
-        return 
-    }
-});
+//         res.json(formattedUsers);
+//         return 
+//     } catch (error: any) {
+//         console.error(`Error fetching users: ${error}`);
+//         res.status(500).json({ error: 'Internal Server Error' });
+//         return 
+//     }
+// });
 
 
 
